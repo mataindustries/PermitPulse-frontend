@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8" />
+          <meta
+                name="viewport"
+                      content="width=device-width, initial-scale=1, maximum-scale=1"
+                          />
+                              <title>PermitPulse — Rebuild Faster</title>
+                                  <meta name="description" content="Live permits, alerts, and summaries." />
+                                      <link rel="icon" href="/favicon.svg" />
+                                          <style>
+                                                :root {
+                                                        --bg:#0b0d12; --card:#12151c; --muted:#96a0b5; --text:#e9eefc; --brand:#6ea8ff; --ok:#34d399; --warn:#f59e0b; --err:#ef4444;
+                                                              }
+                                                                    * { box-sizing: border-box }
+                                                                          body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text) }
+                                                                                .wrap { max-width:1100px; margin:0 auto; padding:24px }
+                                                                                      .hero { display:flex; gap:14px; align-items:center; flex-wrap:wrap }
+                                                                                            .badge { background:#0e1421; color:var(--brand); border:1px solid #152036; padding:4px 8px; border-radius:999px; font-size:12px }
+                                                                                                  .h1 { font-size:28px; font-weight:800; line-height:1.1; letter-spacing:-0.02em }
+                                                                                                        .sub { color:var(--muted) }
+                                                                                                              .grid { display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); margin-top:18px }
+                                                                                                                    .card { background:var(--card); border:1px solid #1b2233; border-radius:16px; padding:16px }
+                                                                                                                          .row { display:flex; justify-content:space-between; gap:10px; align-items:center }
+                                                                                                                                .btn { background:#18233a; border:1px solid #213154; color:#eaf3ff; padding:8px 12px; border-radius:10px; cursor:pointer }
+                                                                                                                                      .btn:hover { filter:brightness(1.1) }
+                                                                                                                                            .btn.ghost { background:transparent }
+                                                                                                                                                  .tag { font-size:12px; color:var(--muted) }
+                                                                                                                                                        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace }
+                                                                                                                                                              input, select { width:100%; padding:10px 12px; background:#0f1421; border:1px solid #1e2a46; color:var(--text); border-radius:10px }
+                                                                                                                                                                    label { font-size:12px; color:var(--muted) }
+                                                                                                                                                                          table { width:100%; border-collapse: collapse; }
+                                                                                                                                                                                th, td { padding:10px; border-bottom:1px solid #1b2233; text-align:left; font-size:14px }
+                                                                                                                                                                                      .status-ok{ color:var(--ok)} .status-warn{color:var(--warn)} .status-err{color:var(--err)}
+                                                                                                                                                                                            .muted { color:var(--muted)}
+                                                                                                                                                                                                  .footer { color:var(--muted); font-size:13px; margin-top:24px }
+                                                                                                                                                                                                        .tabs { display:flex; gap:8px; margin-top:10px }
+                                                                                                                                                                                                              .tab { padding:8px 10px; border-radius:10px; background:#101522; border:1px solid #172036; cursor:pointer; font-size:13px }
+                                                                                                                                                                                                                    .tab.active { background:#16213a; border-color:#22335a }
+                                                                                                                                                                                                                          .mini { font-size:12px }
+                                                                                                                                                                                                                              </style>
+                                                                                                                                                                                                                                </head>
+                                                                                                                                                                                                                                  <body>
+                                                                                                                                                                                                                                      <div id="root"></div>
+                                                                                                                                                                                                                                          <script type="module" src="/src/main.jsx"></script>
+                                                                                                                                                                                                                                            </body>
+                                                                                                                                                                                                                                            </html>
