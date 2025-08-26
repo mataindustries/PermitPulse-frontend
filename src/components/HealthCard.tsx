@@ -22,21 +22,27 @@ export default function HealthCard() {
 
   useEffect(() => { load(); }, []);
 
+  const healthy = data?.ok ?? false;
+
   return (
     <div style={{ border:'1px solid #1f2732', borderRadius:14, padding:16 }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-        <h3 style={{ margin:0 }}>Health</h3>
+        <h3 style={{ margin:0 }}>System Health</h3>
         <button onClick={load} style={{ padding:'6px 10px', borderRadius:8, background:'#0d141c', color:'#cfe1ff', border:'1px solid #1f2732' }}>
           {loading ? <Spinner size={14}/> : 'Refresh'}
         </button>
       </div>
       <div style={{ fontSize:12, opacity:0.8, marginTop:6 }}>
-        {ts ? `Last updated: ${ts}` : null}
+        {ts ? `Last checked: ${ts}` : null}
       </div>
-      <div style={{ marginTop:10, overflow:'auto', maxHeight:280 }}>
-        {loading && <div style={{ padding:8 }}><Spinner /> Loading…</div>}
+      <div style={{ marginTop:10 }}>
+        {loading && <div><Spinner /> Checking…</div>}
         {err && <div style={{ color:'#ff6b6b' }}>Error: {err}</div>}
-        {!loading && !err && <pre style={{ margin:0, whiteSpace:'pre-wrap' }}>{JSON.stringify(data, null, 2)}</pre>}
+        {!loading && !err && (
+          <div style={{ fontSize:16 }}>
+            {healthy ? <span style={{ color:'#7fff9f' }}>✅ Online</span> : <span style={{ color:'#ff6b6b' }}>❌ Offline</span>}
+          </div>
+        )}
       </div>
     </div>
   );
