@@ -1,0 +1,21 @@
+:root {
+  --bg: #0b1118;
+  --panel: #0d141c;
+  --ink: #e9f0ff;
+  --muted: #cfe1ff;
+  --line: #1f2732;
+  color-scheme: dark;
+}
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+}
+* { box-sizing: border-box; }
+a { color: var(--muted); text-decoration: none; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
