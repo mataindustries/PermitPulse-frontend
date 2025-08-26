@@ -3,6 +3,8 @@ import CityButtons from '@/components/CityButtons';
 import PermitTable from '@/components/PermitTable';
 import HealthCard from '@/components/HealthCard';
 import SearchBar from '@/components/SearchBar';
+import PermitTrend from '@/components/PermitTrend';
+import CityStats from '@/components/CityStats';
 import { fetchRecent, type CityKey, type Permit } from '@/lib/api';
 import { matchesQuery, smartCompare, type SortDir } from '@/lib/util';
 import WaitlistModal from '@/components/WaitlistModal';
@@ -25,7 +27,6 @@ export default function Home() {
       const data = await fetchRecent(c);
       setRows(data);
       setTs(new Date().toLocaleString());
-      // choose a sensible default sort key if available
       const keys = Object.keys(data[0] || {});
       const pref = ['status_date','issued_date','issue_date','status','permit_number'];
       const first = pref.find(p=>keys.includes(p)) || keys[0] || null;
@@ -66,11 +67,6 @@ export default function Home() {
         <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:12, flexWrap:'wrap' }}>
           <CityButtons value={city} onChange={(v)=>setCity(v as CityKey)} />
           <SearchBar value={q} onChange={setQ} />
-          <button onClick={()=>setWaitlistOpen(true)}
-                  style={{ marginLeft:'auto', padding:'8px 12px', borderRadius:10, border:'1px solid #1f2732',
-                           background:'#0d141c', color:'#dbe7ff' }}>
-            Join Waitlist
-          </button>
         </div>
 
         <h2 style={{ margin:'8px 0 10px' }}>
@@ -83,6 +79,9 @@ export default function Home() {
           {q ? ` · filter: "${q}"` : ''}
           {sortKey ? ` · sort: ${sortKey} (${sortDir})` : ''}
         </div>
+
+        <CityStats rows={viewRows} />
+        <PermitTrend rows={viewRows} />
 
         <PermitTable
           rows={viewRows}
