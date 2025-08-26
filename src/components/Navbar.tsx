@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function Navbar() {
   return (
     <div style={{
@@ -6,8 +8,8 @@ export default function Navbar() {
     }}>
       <div style={{ fontWeight:700, fontSize:22 }}>PermitPulse</div>
       <div style={{ display:"flex", gap:16, fontSize:14 }}>
-        <a href="/" style={{ color:"#cfe1ff", textDecoration:"none" }}>Dashboard</a>
-        <a href="/pricing" style={{ color:"#cfe1ff", textDecoration:"none" }}>Pricing</a>
+        <Link to="/" style={{ color:"#cfe1ff", textDecoration:"none" }}>Dashboard</Link>
+        <Link to="/pricing" style={{ color:"#cfe1ff", textDecoration:"none" }}>Pricing</Link>
       </div>
     </div>
   );
