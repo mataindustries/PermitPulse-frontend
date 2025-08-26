@@ -12,7 +12,6 @@ async function fetchJSON(url: string): Promise<any> {
   let r = await fetch(url, { headers: { Accept: 'application/json' } });
   if (looksJson(r)) return r.json();
 
-  // toggle trailing slash fallback (avoids SPA HTML)
   const toggled = url.endsWith('/') ? url.slice(0, -1) : url + '/';
   const r2 = await fetch(toggled, { headers: { Accept: 'application/json' } });
   if (looksJson(r2)) return r2.json();

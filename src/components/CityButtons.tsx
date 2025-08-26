@@ -4,11 +4,11 @@ type Props = {
 };
 
 const items: { key: string; label: string }[] = [
-  { key: 'weho', label: 'WeHo' },
+  { key: 'weho',         label: 'WeHo' },
   { key: 'beverlyhills', label: 'Beverly Hills' },
-  { key: 'altadena', label: 'Altadena' },
-  { key: 'palisades', label: 'Palisades' },
-  { key: 'combined', label: 'Combined' },
+  { key: 'altadena',     label: 'Altadena' },
+  { key: 'palisades',    label: 'Palisades' },
+  { key: 'combined',     label: 'Combined' },
 ];
 
 export default function CityButtons({ value, onChange }: Props) {

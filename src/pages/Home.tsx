@@ -6,7 +6,7 @@ import { fetchRecent, type CityKey, type Permit } from '@/lib/api';
 import WaitlistModal from '@/components/WaitlistModal';
 
 export default function Home() {
-  const [city, setCity] = useState<CityKey>('weho');
+  const [city, setCity] = useState<CityKey>('combined'); // default
   const [rows, setRows] = useState<Permit[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string|null>(null);
