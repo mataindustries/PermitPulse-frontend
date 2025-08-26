@@ -1,17 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import CityButtons from '@/components/CityButtons';
 import PermitTable from '@/components/PermitTable';
 import HealthCard from '@/components/HealthCard';
+import SearchBar from '@/components/SearchBar';
 import { fetchRecent, type CityKey, type Permit } from '@/lib/api';
+import { matchesQuery, smartCompare, type SortDir } from '@/lib/util';
 import WaitlistModal from '@/components/WaitlistModal';
 
 export default function Home() {
-  const [city, setCity] = useState<CityKey>('combined'); // default
+  const [city, setCity] = useState<CityKey>('combined');
   const [rows, setRows] = useState<Permit[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string|null>(null);
   const [ts, setTs] = useState<string>('');
   const [waitlistOpen, setWaitlistOpen] = useState(false);
+
+  const [q, setQ] = useState('');
+  const [sortKey, setSortKey] = useState<string|null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
 
   async function load(c: CityKey) {
     try {
@@ -19,6 +25,12 @@ export default function Home() {
       const data = await fetchRecent(c);
       setRows(data);
       setTs(new Date().toLocaleString());
+      // choose a sensible default sort key if available
+      const keys = Object.keys(data[0] || {});
+      const pref = ['status_date','issued_date','issue_date','status','permit_number'];
+      const first = pref.find(p=>keys.includes(p)) || keys[0] || null;
+      setSortKey(first);
+      setSortDir('desc');
     } catch (e:any) {
       setErr(e?.message || 'Failed to fetch');
       setRows([]);
@@ -27,12 +39,36 @@ export default function Home() {
 
   useEffect(() => { load(city); }, [city]);
 
+  const viewRows = useMemo(() => {
+    let r = rows;
+    if (q) r = r.filter(row => matchesQuery(row, q));
+    if (sortKey) {
+      r = [...r].sort((a,b) => {
+        const cmp = smartCompare(a[sortKey!], b[sortKey!]);
+        return sortDir === 'asc' ? cmp : -cmp;
+      });
+    }
+    return r;
+  }, [rows, q, sortKey, sortDir]);
+
+  function handleSort(col: string) {
+    if (col === sortKey) {
+      setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(col);
+      setSortDir('desc');
+    }
+  }
+
   return (
     <div style={{ display:'grid', gridTemplateColumns:'1fr 380px', gap:16 }}>
       <div>
-        <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:12 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:12, flexWrap:'wrap' }}>
           <CityButtons value={city} onChange={(v)=>setCity(v as CityKey)} />
-          <button onClick={()=>setWaitlistOpen(true)} style={{ marginLeft:'auto', padding:'8px 12px', borderRadius:10, border:'1px solid #1f2732', background:'#0d141c', color:'#dbe7ff' }}>
+          <SearchBar value={q} onChange={setQ} />
+          <button onClick={()=>setWaitlistOpen(true)}
+                  style={{ marginLeft:'auto', padding:'8px 12px', borderRadius:10, border:'1px solid #1f2732',
+                           background:'#0d141c', color:'#dbe7ff' }}>
             Join Waitlist
           </button>
         </div>
@@ -44,13 +80,22 @@ export default function Home() {
         </h2>
         <div style={{ fontSize:12, opacity:0.8, marginBottom:8 }}>
           {ts ? `Last updated: ${ts}` : ''}
+          {q ? ` · filter: "${q}"` : ''}
+          {sortKey ? ` · sort: ${sortKey} (${sortDir})` : ''}
         </div>
 
-        <PermitTable rows={rows} loading={loading} error={err} showCity={city==='combined'} />
+        <PermitTable
+          rows={viewRows}
+          loading={loading}
+          error={err}
+          showCity={city==='combined'}
+          sortKey={sortKey}
+          sortDir={sortDir}
+          onSort={handleSort}
+        />
       </div>
 
       <HealthCard />
-
       {waitlistOpen && <WaitlistModal onClose={()=>setWaitlistOpen(false)} />}
     </div>
   );
