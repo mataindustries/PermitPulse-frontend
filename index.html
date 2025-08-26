@@ -1,12 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO Meta -->
     <title>PermitPulse – Permits Made Simple</title>
+    <meta name="description" content="Track building permits across Los Angeles and beyond in one simple dashboard.">
+    <meta property="og:title" content="PermitPulse – Permits Made Simple">
+    <meta property="og:description" content="Your one-stop dashboard for local building permits.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://getpermitpulse.com/">
+    <meta property="og:image" content="/favicon.svg">
+
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0S8S6156CV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-0S8S6156CV');
+    </script>
   </head>
-  <body style="margin:0;background:#0b0f14;color:#e7edf3;font-family:Inter,system-ui,Arial;">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
