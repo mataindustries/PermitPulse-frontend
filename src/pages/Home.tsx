@@ -1,79 +1,57 @@
-import { useEffect, useMemo, useState } from 'react'
-import CityButtons from '@/components/CityButtons'
-import HealthCard from '@/components/HealthCard'
-import PermitTable from '@/components/PermitTable'
-import { CityKey, fetchRecent, fetchHealth, Permit } from '@/lib/api'
+import { useEffect, useState } from 'react';
+import CityButtons from '@/components/CityButtons';
+import PermitTable from '@/components/PermitTable';
+import HealthCard from '@/components/HealthCard';
+import { fetchRecent, type CityKey, type Permit } from '@/lib/api';
+import WaitlistModal from '@/components/WaitlistModal';
 
 export default function Home() {
-  const [city, setCity] = useState<CityKey | null>(null)
-  const [permits, setPermits] = useState<Permit[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string|null>(null)
+  const [city, setCity] = useState<CityKey>('weho');
+  const [rows, setRows] = useState<Permit[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string|null>(null);
+  const [ts, setTs] = useState<string>('');
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
 
-  const [health, setHealth] = useState<any|null>(null)
-  const [healthLoading, setHealthLoading] = useState(false)
-  const [healthError, setHealthError] = useState<string|null>(null)
-
-  const cityTitle = useMemo(() => {
-    if (!city) return 'Choose a city';
-    const map: Record<CityKey,string> = {
-      weho: 'West Hollywood',
-      beverlyhills: 'Beverly Hills',
-      altadena: 'Altadena',
-      palisades: 'Pacific Palisades'
-    }
-    return map[city];
-  }, [city])
-
-  async function loadCity(c: CityKey) {
-    setCity(c)
-    setLoading(true); setError(null)
+  async function load(c: CityKey) {
     try {
-      const data = await fetchRecent(c)
-      setPermits(data)
-    } catch (e: any) {
-      setError(e?.message || 'Failed to load')
-      setPermits([])
-    } finally {
-      setLoading(false)
-    }
+      setLoading(true); setErr(null);
+      const data = await fetchRecent(c);
+      setRows(data);
+      setTs(new Date().toLocaleString());
+    } catch (e:any) {
+      setErr(e?.message || 'Failed to fetch');
+      setRows([]);
+    } finally { setLoading(false); }
   }
 
-  async function loadHealth() {
-    setHealthLoading(true); setHealthError(null)
-    try {
-      const data = await fetchHealth()
-      setHealth(data)
-    } catch (e: any) {
-      setHealthError(e?.message || 'Failed')
-      setHealth(null)
-    } finally {
-      setHealthLoading(false)
-    }
-  }
-
-  useEffect(() => { loadHealth() }, [])
+  useEffect(() => { load(city); }, [city]);
 
   return (
-    <div style={{maxWidth:1100, margin:'0 auto', padding:'16px'}}>
-      <div style={{display:'grid', gap:16}}>
-        <div>
-          <CityButtons active={city} onSelect={loadCity} />
+    <div style={{ display:'grid', gridTemplateColumns:'1fr 380px', gap:16 }}>
+      <div>
+        <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:12 }}>
+          <CityButtons value={city} onChange={(v)=>setCity(v as CityKey)} />
+          <button onClick={()=>setWaitlistOpen(true)} style={{ marginLeft:'auto', padding:'8px 12px', borderRadius:10, border:'1px solid #1f2732', background:'#0d141c', color:'#dbe7ff' }}>
+            Join Waitlist
+          </button>
         </div>
 
-        <div style={{display:'grid', gridTemplateColumns:'1fr 320px', gap:16}}>
-          <div>
-            <h2 style={{margin:'6px 0 12px', fontSize:18}}>{cityTitle}</h2>
-            {loading ? <div>Loading permits…</div> : error ? (
-              <div style={{color:'#ff6b6b'}}>Error: {error}</div>
-            ) : (
-              <PermitTable rows={permits} />
-            )}
-          </div>
-
-          <HealthCard loading={healthLoading} error={healthError} data={health} onRefresh={loadHealth}/>
+        <h2 style={{ margin:'8px 0 10px' }}>
+          {city === 'combined' ? 'All Cities' : city === 'weho' ? 'West Hollywood' :
+           city === 'beverlyhills' ? 'Beverly Hills' :
+           city === 'altadena' ? 'Altadena' : 'Pacific Palisades'}
+        </h2>
+        <div style={{ fontSize:12, opacity:0.8, marginBottom:8 }}>
+          {ts ? `Last updated: ${ts}` : ''}
         </div>
+
+        <PermitTable rows={rows} loading={loading} error={err} showCity={city==='combined'} />
       </div>
+
+      <HealthCard />
+
+      {waitlistOpen && <WaitlistModal onClose={()=>setWaitlistOpen(false)} />}
     </div>
-  )
+  );
 }
