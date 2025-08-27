@@ -1,6 +1,6 @@
-const API_BASE = ''; // same-origin via your domain routes
+const API_BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/+$/,''); // e.g. https://permitpulse-worker.matasergio741.workers.dev
 
-export type CityKey = 'weho' | 'beverlyhills' | 'altadena' | 'palisades' | 'combined';
+export type CityKey = 'weho' | 'beverlyhills' | 'altadena' | 'palisades';
 export type Permit = Record<string, unknown>;
 
 function looksJson(resp: Response) {
@@ -10,45 +10,32 @@ function looksJson(resp: Response) {
 
 async function fetchJSON(url: string): Promise<any> {
   let r = await fetch(url, { headers: { Accept: 'application/json' } });
-  if (looksJson(r)) return r.json();
-
-  const toggled = url.endsWith('/') ? url.slice(0, -1) : url + '/';
-  const r2 = await fetch(toggled, { headers: { Accept: 'application/json' } });
-  if (looksJson(r2)) return r2.json();
-
-  const txt = await r.text().catch(() => '');
-  const txt2 = await r2.text().catch(() => '');
-  throw new Error(`Not JSON: ${txt.slice(0,80) || txt2.slice(0,80)}`);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  if (!looksJson(r)) {
+    const text = (await r.text()).slice(0, 120);
+    throw new Error(`Not JSON: ${text}`);
+  }
+  return r.json();
 }
 
-function extractRows(data: any): Permit[] {
+function extractRows(data: any): any[] {
   if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.items)) return data.items;
-  if (Array.isArray(data?.results)) return data.results;
-  if (Array.isArray(data?.data)) return data.data;
+  if (data?.items && Array.isArray(data.items)) return data.items;
+  if (data?.data && Array.isArray(data.data)) return data.data;
+  if (Array.isArray(data?.payload)) return data.payload;
   if (Array.isArray(data?.rows)) return data.rows;
   return [];
 }
 
 export async function fetchRecent(city: CityKey): Promise<Permit[]> {
-  const base = API_BASE.replace(/\/+$/, '');
-  const path = city === 'combined' ? '/combined/recent' : `/${city}/recent`;
-  const data = await fetchJSON(`${base}${path}`);
+  const base = API_BASE.replace(/\/+$/,'');
+  const url = `${base}/${city}/recent`;
+  const data = await fetchJSON(url);
   return extractRows(data);
 }
 
 export async function fetchHealth() {
-  const base = API_BASE.replace(/\/+$/, '');
-  return fetchJSON(`${base}/health`);
-}
-
-export async function joinWaitlist(city: Exclude<CityKey,'combined'>, email: string) {
-  const base = API_BASE.replace(/\/+$/, '');
-  const r = await fetch(`${base}/waitlist/${city}`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ email })
-  });
-  if (!r.ok) throw new Error(`Waitlist failed: ${r.status}`);
-  return looksJson(r) ? r.json() : { ok: r.ok };
+  const base = API_BASE.replace(/\/+$/,'');
+  const url = `${base}/health`;
+  return fetchJSON(url);
 }
