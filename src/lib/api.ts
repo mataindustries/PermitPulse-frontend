@@ -1,3 +1,4 @@
+const __FALLBACK_URL="https://permitpulse-worker.matasergio741.workers.dev";
 const API_BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/+$/,''); // e.g. https://permitpulse-worker.matasergio741.workers.dev
 
 export type CityKey = 'weho' | 'beverlyhills' | 'altadena' | 'palisades';
