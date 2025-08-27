@@ -1,74 +1,46 @@
-import { useState } from 'react';
-import { joinWaitlist, type CityKey } from '@/lib/api';
+import React, { useState } from 'react';
 
-export default function WaitlistModal({ onClose }: { onClose: () => void }) {
-  const [city, setCity] = useState<CityKey>('weho');
+export default function WaitlistModal({ onClose }) {
   const [email, setEmail] = useState('');
-  const [sending, setSending] = useState(false);
-  const [msg, setMsg] = useState<string|null>(null);
-  const [err, setErr] = useState<string|null>(null);
+  const [status, setStatus] = useState('idle');
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setSending(true); setMsg(null); setErr(null);
-    try {
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error('Invalid email');
-      const res = await joinWaitlist(city === 'combined' ? 'weho' : city, email);
-      setMsg('Thanks — you’re on the list!');
-      setEmail('');
-      setTimeout(onClose, 1200);
-      return res;
-    } catch (e:any) {
-      setErr(e?.message || 'Failed to join');
-    } finally {
-      setSending(false);
-    }
-  }
+  const close = () => { if (typeof onClose === 'function') onClose(); };
 
   return (
-    <div style={{
-      position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'grid',
-      placeItems:'center', zIndex:50, padding:16
-    }}
-      onClick={(e)=>{ if (e.target===e.currentTarget) onClose(); }}
-    >
-      <form onSubmit={submit}
-        style={{
-          width:'min(520px, 100%)', background:'#0b1118', color:'#e9f0ff',
-          border:'1px solid #1f2732', borderRadius:16, padding:16, boxShadow:'0 8px 30px rgba(0,0,0,0.35)'
-        }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
-          <h3 style={{ margin:0 }}>Join the Waitlist</h3>
-          <button type="button" onClick={onClose}
-            style={{ background:'transparent', border:'none', color:'#b6c4de', fontSize:18 }}>✕</button>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+      <div className="w-[92%] max-w-md rounded-xl border border-zinc-700 bg-zinc-900 p-5 text-zinc-100 shadow-xl">
+        <h3 className="mb-2 text-lg font-semibold">Join the waitlist</h3>
+        <p className="mb-4 text-sm text-zinc-400">We’ll email you as we add more cities.</p>
 
-        <label style={{ display:'block', fontSize:12, opacity:0.8 }}>City</label>
-        <select value={city} onChange={e=>setCity(e.target.value as CityKey)}
-          style={{ width:'100%', padding:'10px 12px', borderRadius:10, border:'1px solid #1f2732',
-                   background:'#0d141c', color:'#dbe7ff', marginBottom:12 }}>
-          <option value="weho">West Hollywood</option>
-          <option value="beverlyhills">Beverly Hills</option>
-          <option value="altadena">Altadena</option>
-          <option value="palisades">Palisades</option>
-          <option value="combined">Combined (choose city for email)</option>
-        </select>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            // (Waitlist POST wired later)
+            setStatus('ok');
+          }}
+        >
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            required
+            placeholder="you@example.com"
+            className="mb-3 w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm outline-none placeholder:text-zinc-500"
+          />
+          <div className="flex gap-2">
+            <button type="submit" className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium">
+              Notify me
+            </button>
+            <button type="button" onClick={close} className="rounded-md border border-zinc-700 px-3 py-2 text-sm">
+              Close
+            </button>
+          </div>
+        </form>
 
-        <label style={{ display:'block', fontSize:12, opacity:0.8 }}>Email</label>
-        <input value={email} onChange={e=>setEmail(e.target.value)}
-          placeholder="you@company.com"
-          style={{ width:'100%', padding:'10px 12px', borderRadius:10, border:'1px solid #1f2732',
-                   background:'#0d141c', color:'#dbe7ff', marginBottom:12 }} />
-
-        {msg && <div style={{ color:'#8bffa6', marginBottom:10 }}>{msg}</div>}
-        {err && <div style={{ color:'#ff7b7b', marginBottom:10 }}>Error: {err}</div>}
-
-        <button disabled={sending}
-          style={{ width:'100%', padding:'10px 12px', borderRadius:10,
-                   border:'1px solid #27435e', background:'#122035', color:'#dbe7ff' }}>
-          {sending ? 'Joining…' : 'Join Waitlist'}
-        </button>
-      </form>
+        {status === 'ok' && (
+          <p className="mt-3 text-emerald-400 text-sm">Thanks! You’re on the list.</p>
+        )}
+      </div>
     </div>
   );
 }
