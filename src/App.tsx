@@ -1,5 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
+import ExpansionBanner from "./components/ExpansionBanner";
+// ...
+<div className="space-y-6">
+  <ExpansionBanner />
+    {/* the rest of your dashboard cards */}
+    </div>
 import Home from '@/pages/Home';
 import Pricing from '@/pages/Pricing';
 

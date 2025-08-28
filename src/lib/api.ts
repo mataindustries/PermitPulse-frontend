@@ -1,53 +1,57 @@
 // src/lib/api.ts
-const API_BASE =
-  (import.meta as any)?.env?.VITE_API_BASE ||
-    (typeof window !== 'undefined' ? (window as any).__API_BASE__ : '') ||
-      'https://api.getpermitpulse.com';
+// Centralized API base + helpers
 
-      export type CityKey =
-        | 'weho'
-          | 'beverlyhills'
-            | 'palisades'
-              | 'altadena'
-                | 'sandiego'
-                  | 'sacramento'
-                    | 'combined';
+const ENV_BASE =
+  (typeof window !== "undefined" && (window as any).VITE_API_BASE) ||
+    (import.meta && (import.meta as any).env && (import.meta as any).env.VITE_API_BASE) ||
+      "";
 
-                    export type Permit = Record<string, unknown>;
+      // Fallbacks that work on mobile and Pages:
+      const API_BASE =
+        ENV_BASE && !ENV_BASE.startsWith("http")
+            ? `https://${ENV_BASE}`
+                : ENV_BASE || "https://api.getpermitpulse.com";
 
-                    function looksJson(resp: Response) {
-                      const ct = resp.headers.get('content-type') || '';
-                        return ct.includes('application/json') || ct.includes('json');
-                        }
+                export type Permit = {
+                  permit_number: string | null;
+                    status: string | null;
+                      issue_date: string | null;
+                        address: string | null;
+                          work_description: string | null;
+                            city?: string | null;
+                              _raw?: unknown;
+                              };
 
-                        async function fetchJSON(url: string): Promise<any> {
-                          let r = await fetch(url, { headers: { Accept: 'application/json' } });
-                            if (!r.ok) throw new Error(String(r.status));
-                              return looksJson(r) ? r.json() : JSON.parse(await r.text());
-                              }
+                              async function getJSON<T = any>(path: string): Promise<T> {
+                                const url = `${API_BASE}${path}`;
+                                  const r = await fetch(url, { headers: { Accept: "application/json" } });
+                                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                                      return r.json();
+                                      }
 
-                              function extractRows(data: any): Permit[] {
-                                if (!data) return [];
-                                  if (Array.isArray(data)) return data;
-                                    if (Array.isArray(data?.permits)) return data.permits;
-                                      if (Array.isArray(data?.results)) return data.results;
-                                        if (Array.isArray(data?.data)) return data.data;
-                                          if (Array.isArray(data?.payload)) return data.payload;
-                                            if (Array.isArray(data?.rows)) return data.rows;
-                                              return [];
-                                              }
+                                      export async function health() {
+                                        return getJSON<{ ok: boolean; worker: string; version: string; ts: string }>("/health");
+                                        }
 
-                                              export async function fetchRecent(city: CityKey): Promise<Permit[]> {
-                                                const base = API_BASE.replace(/\/+$/, '');
-                                                  const url =
-                                                      city === 'combined'
-                                                            ? `${base}/combined/recent`
-                                                                  : `${base}/${city}/recent`;
-                                                                    const data = await fetchJSON(url);
-                                                                      return extractRows(data);
-                                                                      }
+                                        // City → route map (matches your new Worker)
+                                        const CITY_ROUTE: Record<string, string> = {
+                                          weho: "/weho/recent",
+                                            "beverly hills": "/beverlyhills/recent",
+                                              palisades: "/palisades/recent",
+                                                altadena: "/altadena/recent",
+                                                  "san diego": "/sandiego/recent",
+                                                    sacramento: "/sacramento/recent",
+                                                    };
 
-                                                                      export async function fetchHealth() {
-                                                                        const base = API_BASE.replace(/\/+$/, '');
-                                                                          return fetchJSON(`${base}/health`);
-                                                                          }
+                                                    export type CityKey = keyof typeof CITY_ROUTE;
+
+                                                    export async function fetchRecent(cityKey: CityKey) {
+                                                      const path = CITY_ROUTE[cityKey];
+                                                        if (!path) throw new Error(`Unknown city: ${cityKey}`);
+                                                          const data = await getJSON<{ ok: boolean; city: string; count: number; permits: Permit[] }>(path);
+                                                            return data.permits ?? [];
+                                                            }
+
+                                                            export function apiBaseForDebug() {
+                                                              return API_BASE;
+                                                              }
