@@ -1,165 +1,161 @@
-import { useEffect, useMemo, useState } from "react";
-import CityButtons from "../components/CityButtons";
+import React, { useEffect, useMemo, useState } from "react";
+import ExpansionBar from "../components/ExpansionBar";
+import WaitlistModal from "../components/WaitlistModal";
 import CityStats from "../components/CityStats";
 import PermitTrend from "../components/PermitTrend";
 import PermitTable from "../components/PermitTable";
-import HealthCard from "../components/HealthCard";
-// If you don’t have WaitlistModal wired yet, you can comment this next line out
-import WaitlistModal from "../components/WaitlistModal";
+import CityButtons from "../components/CityButtons";
 
-type PermitRow = {
-  permit_number?: string;
-    status?: string;
-      issue_date?: string;
-        address?: string;
-          work_description?: string;
-            city?: string;
-            };
+type Permit = {
+  permit_number: string;
+  status?: string;
+  issue_date?: string;
+  address?: string;
+  work_description?: string;
+};
+type ApiRes = {
+  ok: boolean;
+  city?: string;
+  permits?: Permit[];
+  count?: number;
+  ts?: string;
+};
 
-            const API_BASE =
-              (import.meta as any).env?.VITE_API_BASE?.replace(/\/+$/, "") ||
-                "https://api.getpermitpulse.com";
+const API =
+  (import.meta as any).env?.VITE_API_BASE?.replace(/\/+$/, "") ||
+  "https://api.getpermitpulse.com";
 
-                const ENDPOINT: Record<string, string> = {
-                  weho: "weho/recent",
-                    beverlyhills: "beverlyhills/recent",
-                      altadena: "altadena/recent",
-                        palisades: "palisades/recent",
-                          combined: "combined/recent",
-                            sandiego: "sandiego/recent",
-                              sacramento: "sacramento/recent",
-                              };
+export default function Home() {
+  const [city, setCity] = useState<
+    "weho" | "beverlyhills" | "altadena" | "palisades"
+  >("weho");
+  const [rows, setRows] = useState<Permit[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [ts, setTs] = useState<string | null>(null);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const [q, setQ] = useState("");
 
-                              async function fetchRecent(city: string): Promise<PermitRow[]> {
-                                const path = ENDPOINT[city] ?? ENDPOINT.weho;
-                                  const resp = await fetch(`${API_BASE}/${path}`, { headers: { Accept: "application/json" } });
-                                    if (!resp.ok) throw new Error(`${resp.status}`);
-                                      const data = await resp.json();
-                                        return Array.isArray(data?.permits) ? data.permits : [];
-                                        }
+  useEffect(() => {
+    let stop = false;
+    async function go() {
+      setLoading(true);
+      setErr(null);
+      try {
+        const r = await fetch(`${API}/${city}/recent`, {
+          headers: { Accept: "application/json" },
+        });
+        if (!r.ok) throw new Error(String(r.status));
+        const j: ApiRes = await r.json();
+        if (!stop) {
+          setRows(j.permits || []);
+          setTs(j.ts || null);
+        }
+      } catch (e: any) {
+        if (!stop) setErr(e?.message || "Failed to fetch");
+      } finally {
+        if (!stop) setLoading(false);
+      }
+    }
+    go();
+    return () => {
+      stop = true;
+    };
+  }, [city]);
 
-                                        export default function Home() {
-                                          const [city, setCity] = useState<keyof typeof ENDPOINT>("weho");
-                                            const [rows, setRows] = useState<PermitRow[]>([]);
-                                              const [loading, setLoading] = useState(false);
-                                                const [err, setErr] = useState<string | null>(null);
+  const viewRows = useMemo(() => {
+    let r = rows;
+    if (q) {
+      const s = q.toLowerCase();
+      r = r.filter(
+        (x) =>
+          x.permit_number?.toLowerCase().includes(s) ||
+          x.address?.toLowerCase().includes(s) ||
+          x.work_description?.toLowerCase().includes(s) ||
+          x.status?.toLowerCase().includes(s),
+      );
+    }
+    // demo fallback on ?demo=1
+    const demo = new URLSearchParams(location.search).get("demo") === "1";
+    if (r.length === 0 && demo) {
+      r = [
+        {
+          permit_number: "BH-24-00123",
+          status: "Issued",
+          issue_date: "2025-08-20",
+          address: "123 N Canon Dr",
+          work_description: "Kitchen Remodel",
+        },
+        {
+          permit_number: "WEHO-24-44567",
+          status: "Issued",
+          issue_date: "2025-08-18",
+          address: "8421 Sunset Blvd",
+          work_description: "Tenant Improvement",
+        },
+      ];
+    }
+    return r;
+  }, [rows, q]);
 
-                                                  // simple UI state
-                                                    const [waitlistOpen, setWaitlistOpen] = useState(false);
-                                                      const [q, setQ] = useState("");
-                                                        const [sortKey, setSortKey] = useState<keyof PermitRow | "issue_date">("issue_date");
-                                                          const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  return (
+    <div style={{ paddingBottom: 40 }}>
+      <ExpansionBar onJoin={() => setWaitlistOpen(true)} />
+      <div
+        className="container"
+        style={{ maxWidth: 1100, margin: "0 auto", padding: "16px" }}
+      >
+        <h1 style={{ marginTop: 8 }}>PermitPulse</h1>
+        <div style={{ margin: "12px 0" }}>
+          <CityButtons city={city} onChange={setCity} />
+        </div>
 
-                                                            // fetch whenever city changes
-                                                              useEffect(() => {
-                                                                  let cancelled = false;
-                                                                      setLoading(true);
-                                                                          setErr(null);
-                                                                              fetchRecent(city)
-                                                                                    .then((r) => !cancelled && setRows(r))
-                                                                                          .catch((e) => !cancelled && setErr(e?.message ?? "Failed to fetch"))
-                                                                                                .finally(() => !cancelled && setLoading(false));
-                                                                                                    return () => {
-                                                                                                          cancelled = true;
-                                                                                                              };
-                                                                                                                }, [city]);
+        <input
+          placeholder="Search address, status, permit #"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          style={{
+            width: "100%",
+            background: "#0f172a",
+            color: "white",
+            border: "1px solid rgba(255,255,255,.12)",
+            padding: "10px 12px",
+            borderRadius: 10,
+            margin: "8px 0 16px",
+          }}
+        />
 
-                                                                                                                  // filtering + sorting kept tiny and fast on the client
-                                                                                                                    const viewRows = useMemo(() => {
-                                                                                                                        let r = rows;
-                                                                                                                            if (q) {
-                                                                                                                                  const n = q.toLowerCase();
-                                                                                                                                        r = r.filter(
-                                                                                                                                                (x) =>
-                                                                                                                                                          (x.address || "").toLowerCase().includes(n) ||
-                                                                                                                                                                    (x.permit_number || "").toLowerCase().includes(n) ||
-                                                                                                                                                                              (x.status || "").toLowerCase().includes(n) ||
-                                                                                                                                                                                        (x.work_description || "").toLowerCase().includes(n)
-                                                                                                                                                                                              );
-                                                                                                                                                                                                  }
-                                                                                                                                                                                                      const dir = sortDir === "asc" ? 1 : -1;
-                                                                                                                                                                                                          return [...r].sort((a, b) => {
-                                                                                                                                                                                                                const av = (a[sortKey] ?? "") as string;
-                                                                                                                                                                                                                      const bv = (b[sortKey] ?? "") as string;
-                                                                                                                                                                                                                            // special-case dates
-                                                                                                                                                                                                                                  if (sortKey === "issue_date") {
-                                                                                                                                                                                                                                          return (new Date(av).getTime() - new Date(bv).getTime()) * dir;
-                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                      return av.localeCompare(bv) * dir;
-                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                            }, [rows, q, sortKey, sortDir]);
+        <h2 style={{ marginTop: 10, marginBottom: 8 }}>
+          {city === "weho" && "West Hollywood"}
+          {city === "beverlyhills" && "Beverly Hills"}
+          {city === "altadena" && "Altadena"}
+          {city === "palisades" && "Palisades"}
+        </h2>
 
-                                                                                                                                                                                                                                                              const handleSort = (key: keyof PermitRow | "issue_date") => {
-                                                                                                                                                                                                                                                                  setSortKey(key);
-                                                                                                                                                                                                                                                                      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-                                                                                                                                                                                                                                                                        };
+        <div style={{ opacity: 0.85, marginBottom: 12, fontSize: 14 }}>
+          {ts ? `Last updated: ${new Date(ts).toLocaleString()}` : ""}
+          {q ? ` · filter: “${q}”` : ""}
+        </div>
 
-                                                                                                                                                                                                                                                                          return (
-                                                                                                                                                                                                                                                                              <div className="p-4 md:p-6 max-w-6xl mx-auto">
-                                                                                                                                                                                                                                                                                    <CityButtons
-                                                                                                                                                                                                                                                                                            value={city}
-                                                                                                                                                                                                                                                                                                    onChange={(c) => setCity(c as any)}
-                                                                                                                                                                                                                                                                                                            // Make sure your CityButtons set includes: weho, beverlyhills, altadena, palisades, combined
-                                                                                                                                                                                                                                                                                                                    // (and you can add sandiego / sacramento when ready)
-                                                                                                                                                                                                                                                                                                                          />
+        <CityStats rows={viewRows} />
+        <PermitTrend rows={viewRows} />
 
-                                                                                                                                                                                                                                                                                                                                <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                                                                                                                                                                                                                                                                                                                        <div className="lg:col-span-2">
-                                                                                                                                                                                                                                                                                                                                                  <h2 className="text-2xl font-semibold mb-2 capitalize">
-                                                                                                                                                                                                                                                                                                                                                              {city === "weho"
-                                                                                                                                                                                                                                                                                                                                                                            ? "West Hollywood"
-                                                                                                                                                                                                                                                                                                                                                                                          : city === "beverlyhills"
-                                                                                                                                                                                                                                                                                                                                                                                                        ? "Beverly Hills"
-                                                                                                                                                                                                                                                                                                                                                                                                                      : city === "altadena"
-                                                                                                                                                                                                                                                                                                                                                                                                                                    ? "Altadena"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                  : city === "palisades"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                ? "Pacific Palisades"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                              : city === "combined"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ? "All Cities"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          : city === "sandiego"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ? "San Diego"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      : city === "sacramento"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ? "Sacramento"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  : city}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </h2>
+        <PermitTable
+          rows={viewRows}
+          loading={loading}
+          error={err}
+          showCity={false}
+          sortKey={"issue_date"}
+          sortDir={"desc"}
+          onSort={() => {}}
+        />
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      <div className="flex items-center gap-2 text-sm text-slate-300 mb-3">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <input
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                value={q}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              onChange={(e) => setQ(e.target.value)}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            placeholder="Search address, status, permit…"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          className="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2 outline-none"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      />
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <CityStats rows={rows} />
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <PermitTrend rows={rows} />
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              <PermitTable
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          rows={viewRows}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      loading={loading}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  error={err}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              showCity={city === "combined"}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          sortKey={sortKey}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      sortDir={sortDir}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  onSort={handleSort}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            />
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      <HealthCard />
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div className="mt-4">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <button
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          onClick={() => setWaitlistOpen(true)}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        className="w-full rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white py-2 font-medium"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    >
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  Join Early Access
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </button>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </div>
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {waitlistOpen && <WaitlistModal onClose={() => setWaitlistOpen(false)} />}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  );
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  }
+        <WaitlistModal
+          open={waitlistOpen}
+          onClose={() => setWaitlistOpen(false)}
+          defaultCity={city}
+        />
+      </div>
+    </div>
+  );
+}

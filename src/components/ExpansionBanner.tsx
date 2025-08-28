@@ -3,43 +3,43 @@ import React from "react";
 
 export default function ExpansionBanner() {
   return (
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-indigo-600/30 via-fuchsia-500/20 to-cyan-500/30 p-[1px]">
-            <div className="relative rounded-2xl bg-[#0c0f14]/80">
-                    {/* Top line */}
-                            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-                                      <div className="text-white/90 font-semibold tracking-wide">
-                                                  🚀 California expansion accelerating
-                                                            </div>
-                                                                      <div className="flex items-center gap-2">
-                                                                                  <a
-                                                                                                href="/pricing"
-                                                                                                              className="px-3 py-1.5 rounded-lg bg-white text-black text-sm font-semibold hover:opacity-90"
-                                                                                                                          >
-                                                                                                                                        Try Pro
-                                                                                                                                                    </a>
-                                                                                                                                                                <a
-                                                                                                                                                                              href="#waitlist"
-                                                                                                                                                                                            className="px-3 py-1.5 rounded-lg border border-white/30 text-white/90 text-sm hover:bg-white/10"
-                                                                                                                                                                                                        >
-                                                                                                                                                                                                                      Join Early Access
-                                                                                                                                                                                                                                  </a>
-                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                    </div>
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-indigo-600/30 via-fuchsia-500/20 to-cyan-500/30 p-[1px]">
+      <div className="relative rounded-2xl bg-[#0c0f14]/80">
+        {/* Top line */}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+          <div className="text-white/90 font-semibold tracking-wide">
+            🚀 California expansion accelerating
+          </div>
+          <div className="flex items-center gap-2">
+            <a
+              href="/pricing"
+              className="px-3 py-1.5 rounded-lg bg-white text-black text-sm font-semibold hover:opacity-90"
+            >
+              Try Pro
+            </a>
+            <a
+              href="#waitlist"
+              className="px-3 py-1.5 rounded-lg border border-white/30 text-white/90 text-sm hover:bg-white/10"
+            >
+              Join Early Access
+            </a>
+          </div>
+        </div>
 
-                                                                                                                                                                                                                                                            {/* Ticker */}
-                                                                                                                                                                                                                                                                    <div className="relative h-8 overflow-hidden border-t border-white/10">
-                                                                                                                                                                                                                                                                              <div className="absolute inset-0 animate-marquee whitespace-nowrap text-sm text-white/80">
-                                                                                                                                                                                                                                                                                          <span className="mx-6">✅ Altadena added</span>
-                                                                                                                                                                                                                                                                                                      <span className="mx-6">🧪 San Diego (CSV) live</span>
-                                                                                                                                                                                                                                                                                                                  <span className="mx-6">🧪 Sacramento (ArcGIS) live</span>
-                                                                                                                                                                                                                                                                                                                              <span className="mx-6">🎯 Culver City + Long Beach next</span>
-                                                                                                                                                                                                                                                                                                                                          <span className="mx-6">🌎 Statewide rollout underway</span>
-                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                  </div>
+        {/* Ticker */}
+        <div className="relative h-8 overflow-hidden border-t border-white/10">
+          <div className="absolute inset-0 animate-marquee whitespace-nowrap text-sm text-white/80">
+            <span className="mx-6">✅ Altadena added</span>
+            <span className="mx-6">🧪 San Diego (CSV) live</span>
+            <span className="mx-6">🧪 Sacramento (ArcGIS) live</span>
+            <span className="mx-6">🎯 Culver City + Long Beach next</span>
+            <span className="mx-6">🌎 Statewide rollout underway</span>
+          </div>
+        </div>
+      </div>
 
-                                                                                                                                                                                                                                                                                                                                                                        {/* subtle confetti dots */}
-                                                                                                                                                                                                                                                                                                                                                                              <div className="pointer-events-none absolute inset-0 [background-image:radial-gradient(2px_2px_at_20px_20px,rgba(255,255,255,.15),transparent_40%),radial-gradient(2px_2px_at_120px_80px,rgba(255,255,255,.12),transparent_40%)]" />
-                                                                                                                                                                                                                                                                                                                                                                                  </div>
-                                                                                                                                                                                                                                                                                                                                                                                    );
-                                                                                                                                                                                                                                                                                                                                                                                    }
+      {/* subtle confetti dots */}
+      <div className="pointer-events-none absolute inset-0 [background-image:radial-gradient(2px_2px_at_20px_20px,rgba(255,255,255,.15),transparent_40%),radial-gradient(2px_2px_at_120px_80px,rgba(255,255,255,.12),transparent_40%)]" />
+    </div>
+  );
+}

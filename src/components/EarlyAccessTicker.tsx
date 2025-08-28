@@ -19,17 +19,27 @@ export default function EarlyAccessTicker() {
           setTotal(j.total);
         }
       } catch {
-        if (!cancel) { setRemaining(72); setTotal(100); } // safe fallback
+        if (!cancel) {
+          setRemaining(72);
+          setTotal(100);
+        } // safe fallback
       }
     })();
-    return () => { cancel = true; };
+    return () => {
+      cancel = true;
+    };
   }, []);
 
   return (
     <div className="w-full bg-emerald-500/10 border-b border-emerald-400/20 text-emerald-200 text-sm px-3 py-2 text-center">
-      {remaining != null && total != null
-        ? <>⚡ <b>{remaining}</b> early-access spots left (of {total}) — lock in founder pricing today</>
-        : <>⚡ Early-access spots are limited — lock in founder pricing today</>}
+      {remaining != null && total != null ? (
+        <>
+          ⚡ <b>{remaining}</b> early-access spots left (of {total}) — lock in
+          founder pricing today
+        </>
+      ) : (
+        <>⚡ Early-access spots are limited — lock in founder pricing today</>
+      )}
     </div>
   );
 }

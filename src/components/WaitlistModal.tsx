@@ -1,119 +1,129 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { subscribe } from "../lib/api";
 
-type Props = { onClose?: () => void };
+export default function WaitlistModal({
+  open,
+  onClose,
+  defaultCity,
+}: {
+  open: boolean;
+  onClose: () => void;
+  defaultCity?: string;
+}) {
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState<string | undefined>(defaultCity);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
-type Stats = { ok: boolean; total: number; joined: number; remaining: number };
+  if (!open) return null;
 
-export default function WaitlistModal({ onClose }: Props) {
-  const [stats, setStats] = useState<Stats | null>(null);
-    const [email, setEmail] = useState("");
-      const [busy, setBusy] = useState(false);
-        const [done, setDone] = useState(false);
-          const [err, setErr] = useState<string | null>(null);
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setErr(null);
+    setMsg(null);
+    try {
+      await subscribe(email, city);
+      setMsg("You're on the list! 🚀");
+      setEmail("");
+    } catch (e: any) {
+      setErr(e?.message || "Failed to join. Try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
-            useEffect(() => {
-                let cancelled = false;
-                    (async () => {
-                          try {
-                                  const r = await fetch("https://api.getpermitpulse.com/waitlist/stats", {
-                                            headers: { Accept: "application/json" },
-                                                    });
-                                                            const j = (await r.json()) as Stats;
-                                                                    if (!cancelled && j?.ok) setStats(j);
-                                                                          } catch {
-                                                                                  if (!cancelled) {
-                                                                                            // fallback numbers
-                                                                                                      setStats({ ok: true, total: 100, joined: 28, remaining: 72 });
-                                                                                                              }
-                                                                                                                    }
-                                                                                                                        })();
-                                                                                                                            return () => {
-                                                                                                                                  cancelled = true;
-                                                                                                                                      };
-                                                                                                                                        }, []);
-
-                                                                                                                                          async function submit(e: React.FormEvent) {
-                                                                                                                                              e.preventDefault();
-                                                                                                                                                  setErr(null);
-                                                                                                                                                      if (!email) {
-                                                                                                                                                            setErr("Please enter an email");
-                                                                                                                                                                  return;
-                                                                                                                                                                      }
-                                                                                                                                                                          setBusy(true);
-                                                                                                                                                                              try {
-                                                                                                                                                                                    // use your existing subscribe endpoint
-                                                                                                                                                                                          const r = await fetch("/subscribe", {
-                                                                                                                                                                                                  method: "POST",
-                                                                                                                                                                                                          headers: { "Content-Type": "application/json" },
-                                                                                                                                                                                                                  body: JSON.stringify({ email }),
-                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                              if (!r.ok) throw new Error(`HTTP ${r.status}`);
-                                                                                                                                                                                                                                    setDone(true);
-                                                                                                                                                                                                                                        } catch {
-                                                                                                                                                                                                                                              setErr("Something went wrong. Please try again.");
-                                                                                                                                                                                                                                                  } finally {
-                                                                                                                                                                                                                                                        setBusy(false);
-                                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                                              }
-
-                                                                                                                                                                                                                                                                const remaining = stats?.remaining ?? 72;
-                                                                                                                                                                                                                                                                  const total = stats?.total ?? 100;
-
-                                                                                                                                                                                                                                                                    return (
-                                                                                                                                                                                                                                                                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-                                                                                                                                                                                                                                                                              <div className="w-[92%] max-w-md rounded-xl border border-white/10 bg-[#0b1220] p-5 shadow-xl">
-                                                                                                                                                                                                                                                                                      <div className="mb-3 flex items-center justify-between">
-                                                                                                                                                                                                                                                                                                <div className="text-white text-lg font-semibold">Early Access</div>
-                                                                                                                                                                                                                                                                                                          <span className="rounded-full bg-emerald-500/15 text-emerald-300 text-xs px-2 py-1">
-                                                                                                                                                                                                                                                                                                                      {total} spots • {remaining} left
-                                                                                                                                                                                                                                                                                                                                </span>
-                                                                                                                                                                                                                                                                                                                                        </div>
-
-                                                                                                                                                                                                                                                                                                                                                <p className="text-white/80 text-sm mb-4">
-                                                                                                                                                                                                                                                                                                                                                          Get permits before the crowd. Join the early access list and lock in
-                                                                                                                                                                                                                                                                                                                                                                    founder pricing forever.
-                                                                                                                                                                                                                                                                                                                                                                            </p>
-
-                                                                                                                                                                                                                                                                                                                                                                                    {done ? (
-                                                                                                                                                                                                                                                                                                                                                                                              <div className="rounded-md bg-emerald-600/15 text-emerald-300 p-3 text-sm">
-                                                                                                                                                                                                                                                                                                                                                                                                          You’re on the list! We’ll email you as new cities go live.
-                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                            ) : (
-                                                                                                                                                                                                                                                                                                                                                                                                                                      <form onSubmit={submit} className="space-y-3">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                  <input
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                type="email"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                              value={email}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            onChange={(e) => setEmail(e.currentTarget.value)}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          className="w-full rounded-md bg-black/30 border border-white/10 px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        placeholder="your@email.com"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    />
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {err && (
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              <div className="text-rose-300/90 bg-rose-500/10 border border-rose-500/20 rounded-md px-3 py-2 text-sm">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              {err}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        )}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <button
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  type="submit"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                disabled={busy}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              className="w-full rounded-md bg-white/90 text-black font-medium py-2 hover:bg-white transition disabled:opacity-50"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          >
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        {busy ? "Joining…" : "Join the Waitlist"}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </button>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </form>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      )}
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              <div className="mt-4 flex items-center justify-between text-xs text-white/50">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <span>Privacy-first • 1-click unsubscribe</span>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  {onClose && (
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              <button
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            onClick={onClose}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          className="text-white/60 hover:text-white/90 underline"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      >
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    Close
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </button>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          )}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              );
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              }
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,.6)",
+        display: "grid",
+        placeItems: "center",
+        zIndex: 50,
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          width: "min(92vw, 520px)",
+          background: "#0b1220",
+          color: "#e5e7eb",
+          border: "1px solid rgba(255,255,255,.08)",
+          borderRadius: 14,
+          padding: 18,
+          boxShadow: "0 10px 30px rgba(0,0,0,.5)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 style={{ margin: "0 0 8px 0" }}>Join early access</h3>
+        <p style={{ marginTop: 0, opacity: 0.9 }}>
+          Be first to see new cities and get founder pricing.
+        </p>
+        <form onSubmit={onSubmit} style={{ display: "grid", gap: 10 }}>
+          <input
+            type="email"
+            placeholder="you@company.com"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{
+              background: "#0f172a",
+              color: "white",
+              border: "1px solid rgba(255,255,255,.12)",
+              padding: "10px 12px",
+              borderRadius: 10,
+            }}
+          />
+          <input
+            type="text"
+            placeholder="City (optional)"
+            value={city || ""}
+            onChange={(e) => setCity(e.target.value || undefined)}
+            style={{
+              background: "#0f172a",
+              color: "white",
+              border: "1px solid rgba(255,255,255,.12)",
+              padding: "10px 12px",
+              borderRadius: 10,
+            }}
+          />
+          <div style={{ display: "flex", gap: 10 }}>
+            <button
+              disabled={loading}
+              style={{
+                background: "#60a5fa",
+                color: "#0b1220",
+                fontWeight: 800,
+                border: 0,
+                padding: "10px 12px",
+                borderRadius: 10,
+                flex: 1,
+                opacity: loading ? 0.7 : 1,
+              }}
+            >
+              {loading ? "Joining…" : "Join Waitlist"}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                background: "transparent",
+                color: "#9ca3af",
+                border: "1px solid rgba(255,255,255,.15)",
+                padding: "10px 12px",
+                borderRadius: 10,
+              }}
+            >
+              Close
+            </button>
+          </div>
+          {msg && <div style={{ color: "#34d399" }}>{msg}</div>}
+          {err && <div style={{ color: "#f87171" }}>{err}</div>}
+        </form>
+      </div>
+    </div>
+  );
+}

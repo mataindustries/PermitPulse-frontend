@@ -6,26 +6,41 @@
   --line: #1f2732;
   color-scheme: dark;
 }
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   background: var(--bg);
   color: var(--ink);
 }
-* { box-sizing: border-box; }
-a { color: var(--muted); text-decoration: none; }
+* {
+  box-sizing: border-box;
+}
+a {
+  color: var(--muted);
+  text-decoration: none;
+}
 .card {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 14px;
 }
-table thead th { position:sticky; top:0; background:#0d141c; }
+table thead th {
+  position: sticky;
+  top: 0;
+  background: #0d141c;
+}
 /* Marquee used by ExpansionBanner */
 @keyframes marquee {
-  0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-    }
-    .animate-marquee {
-      animation: marquee 20s linear infinite;
-        will-change: transform;
-        }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+  will-change: transform;
+}
