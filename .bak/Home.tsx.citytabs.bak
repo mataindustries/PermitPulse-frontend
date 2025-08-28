@@ -34,9 +34,6 @@ export default function Home() {
   const [err, setErr] = useState<string | null>(null);
   const [ts, setTs] = useState<string | null>(null);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
-  const [waitlistDefaultCity, setWaitlistDefaultCity] = useState<
-    string | undefined
-  >(undefined);
   const [q, setQ] = useState("");
 
   useEffect(() => {
@@ -78,6 +75,7 @@ export default function Home() {
           x.status?.toLowerCase().includes(s),
       );
     }
+    // demo fallback on ?demo=1
     const demo = new URLSearchParams(location.search).get("demo") === "1";
     if (r.length === 0 && demo) {
       r = [
@@ -102,26 +100,14 @@ export default function Home() {
 
   return (
     <div style={{ paddingBottom: 40 }}>
-      <ExpansionBar
-        onJoin={() => {
-          setWaitlistDefaultCity(undefined);
-          setWaitlistOpen(true);
-        }}
-      />
+      <ExpansionBar onJoin={() => setWaitlistOpen(true)} />
       <div
         className="container"
         style={{ maxWidth: 1100, margin: "0 auto", padding: "16px" }}
       >
         <h1 style={{ marginTop: 8 }}>PermitPulse</h1>
         <div style={{ margin: "12px 0" }}>
-          <CityButtons
-            city={city}
-            onChange={setCity}
-            onComingSoon={(label) => {
-              setWaitlistDefaultCity(label);
-              setWaitlistOpen(true);
-            }}
-          />
+          <CityButtons city={city} onChange={setCity} />
         </div>
 
         <input
@@ -167,7 +153,7 @@ export default function Home() {
         <WaitlistModal
           open={waitlistOpen}
           onClose={() => setWaitlistOpen(false)}
-          defaultCity={waitlistDefaultCity ?? city}
+          defaultCity={city}
         />
       </div>
     </div>

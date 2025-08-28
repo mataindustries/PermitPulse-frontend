@@ -1,49 +1,81 @@
-// src/components/CityButtons.tsx
 import React from "react";
 
-type Props = {
-  value: string;
-  onChange: (key: string) => void;
-};
+type LiveCity = "weho" | "beverlyhills" | "altadena" | "palisades";
 
-const choices: { key: string; label: string; badge?: string }[] = [
-  { key: "weho", label: "WeHo" },
-  { key: "beverly hills", label: "Beverly Hills" },
-  { key: "altadena", label: "Altadena", badge: "New" },
-  { key: "palisades", label: "Palisades" },
-  { key: "san diego", label: "San Diego", badge: "Beta" },
-  { key: "sacramento", label: "Sacramento", badge: "Beta" },
-  { key: "combined", label: "Combined" }, // your existing combined view
-];
+export default function CityButtons({
+  city,
+  onChange,
+  onComingSoon,
+}: {
+  city: LiveCity;
+  onChange: (c: LiveCity) => void;
+  onComingSoon?: (label: string) => void;
+}) {
+  const live: { key: LiveCity; label: string }[] = [
+    { key: "weho", label: "WeHo" },
+    { key: "beverlyhills", label: "Beverly Hills" },
+    { key: "altadena", label: "Altadena" },
+    { key: "palisades", label: "Palisades" },
+  ];
 
-export default function CityButtons({ value, onChange }: Props) {
+  const comingSoon: string[] = [
+    "San Diego",
+    "Sacramento",
+    "San Jose",
+    "Santa Clara",
+    "San Francisco",
+    "Long Beach",
+    "Culver City",
+  ];
+
+  const pill = {
+    base: {
+      padding: "8px 12px",
+      borderRadius: 12,
+      border: "1px solid rgba(255,255,255,.08)",
+      background: "#0f172a",
+      color: "#e5e7eb",
+      cursor: "pointer",
+      fontWeight: 700 as const,
+    },
+    active: {
+      background: "#1f3b77",
+      borderColor: "rgba(99,102,241,.4)",
+    },
+    soon: {
+      background: "transparent",
+      color: "#93c5fd",
+      borderStyle: "dashed" as const,
+      borderColor: "rgba(147,197,253,.4)",
+    },
+  };
+
   return (
-    <div className="flex flex-wrap gap-3">
-      {choices.map((c) => {
-        const active = value.toLowerCase() === c.key;
-        return (
-          <button
-            key={c.key}
-            onClick={() => onChange(c.key)}
-            className={
-              "px-4 py-2 rounded-xl border transition-colors " +
-              (active
-                ? "bg-white/10 border-white/20 text-white"
-                : "bg-white/5 border-white/10 text-white/80 hover:bg-white/10")
-            }
-            aria-pressed={active}
-          >
-            <span className="inline-flex items-center gap-2">
-              {c.label}
-              {c.badge && (
-                <span className="text-[10px] px-2 py-[2px] rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                  {c.badge}
-                </span>
-              )}
-            </span>
-          </button>
-        );
-      })}
+    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" as const }}>
+      {live.map((c) => (
+        <button
+          key={c.key}
+          onClick={() => onChange(c.key)}
+          style={{
+            ...pill.base,
+            ...(city === c.key ? pill.active : {}),
+          }}
+        >
+          {c.label}
+        </button>
+      ))}
+
+      <span style={{ opacity: 0.6, marginLeft: 6 }}>Next:</span>
+      {comingSoon.map((label) => (
+        <button
+          key={label}
+          onClick={() => onComingSoon?.(label)}
+          title="Join waitlist for early access"
+          style={{ ...pill.base, ...pill.soon }}
+        >
+          {label} 🚧
+        </button>
+      ))}
     </div>
   );
 }

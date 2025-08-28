@@ -1,116 +1,85 @@
-export default function Pricing() {
-  const tiers = [
-    {
-      name: "Starter",
-      price: "Free",
-      desc: "Basic city permit tracking for individuals.",
-      features: [
-        "1 City access",
-        "30-day permit history",
-        "Email alerts (coming soon)",
-      ],
-      cta: { label: "Get Started", link: "/" },
-    },
-    {
-      name: "Pro",
-      price: "$29 /mo",
-      desc: "For small businesses who need deeper insights.",
-      features: [
-        "Up to 3 cities",
-        "1-year permit history",
-        "Trends + charts",
-        "Priority email alerts",
-      ],
-      // ✅ Your live Stripe checkout link
-      cta: {
-        label: "Upgrade to Pro",
-        link: "https://buy.stripe.com/4gM7sM6Ld86L0l94NA1wY07",
-      },
-    },
-    {
-      name: "Enterprise",
-      price: "Custom",
-      desc: "Tailored solutions for enterprises, law firms, and agencies.",
-      features: [
-        "Unlimited cities",
-        "Full history",
-        "API access",
-        "Dedicated support",
-      ],
-      cta: {
-        label: "Contact Sales",
-        link: "mailto:founder@getpermitpulse.com",
-      },
-    },
-  ];
+import React from "react";
 
+export default function Pricing() {
   return (
-    <div style={{ padding: "20px", maxWidth: 900, margin: "0 auto" }}>
-      <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>
-        Pricing
-      </h1>
-      <p style={{ opacity: 0.7, marginBottom: 24 }}>
-        Choose the plan that fits your needs. Upgrade anytime.
-      </p>
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: 24 }}>
+      <h1>Pricing</h1>
+      <p style={{ opacity: 0.8 }}>Founder access is limited. Lock it now.</p>
+
       <div
         style={{
           display: "grid",
+          gap: 16,
           gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
-          gap: 20,
+          marginTop: 16,
         }}
       >
-        {tiers.map((t) => (
-          <div
-            key={t.name}
-            className="card"
+        <div
+          style={{
+            border: "1px solid rgba(255,255,255,.1)",
+            borderRadius: 12,
+            padding: 18,
+            background: "#0f172a",
+          }}
+        >
+          <h3>Free</h3>
+          <ul>
+            <li>LA pilot cities</li>
+            <li>Basic search</li>
+            <li>Weekly refresh</li>
+          </ul>
+        </div>
+        <div
+          style={{
+            border: "2px solid #60a5fa",
+            borderRadius: 12,
+            padding: 18,
+            background: "#0b1220",
+          }}
+        >
+          <h3
             style={{
-              padding: 20,
               display: "flex",
-              flexDirection: "column",
               justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            <div>
-              <h2 style={{ fontSize: 20, marginBottom: 4 }}>{t.name}</h2>
-              <div style={{ fontSize: 22, fontWeight: 600, marginBottom: 8 }}>
-                {t.price}
-              </div>
-              <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
-                {t.desc}
-              </p>
-              <ul
-                style={{
-                  paddingLeft: 20,
-                  margin: 0,
-                  fontSize: 13,
-                  marginBottom: 16,
-                }}
-              >
-                {t.features.map((f) => (
-                  <li key={f}>{f}</li>
-                ))}
-              </ul>
-            </div>
-            <a
-              href={t.cta.link}
-              target="_blank"
-              rel="noopener noreferrer"
+            PermitPulse Pro{" "}
+            <span
               style={{
-                display: "block",
-                marginTop: "auto",
-                textAlign: "center",
-                padding: "10px 14px",
-                borderRadius: 10,
-                background: "#2563eb",
-                color: "#fff",
-                fontWeight: 600,
-                textDecoration: "none",
+                fontSize: 12,
+                background: "#60a5fa",
+                color: "#0b1220",
+                padding: "2px 8px",
+                borderRadius: 999,
               }}
             >
-              {t.cta.label}
-            </a>
-          </div>
-        ))}
+              Founder Deal
+            </span>
+          </h3>
+          <ul>
+            <li>Priority new cities (SD, SAC, SJ, SF, LB, CC)</li>
+            <li>Daily updates</li>
+            <li>CSV export</li>
+            <li>Email alerts</li>
+            <li>VIP onboarding</li>
+          </ul>
+          <a
+            href="https://buy.stripe.com/4gM7sM6Ld86L0l94NA1wY07"
+            style={{
+              display: "inline-block",
+              marginTop: 8,
+              background: "#22c55e",
+              color: "#0b1220",
+              fontWeight: 800,
+              padding: "10px 14px",
+              borderRadius: 10,
+              textDecoration: "none",
+            }}
+          >
+            Upgrade – Secure Founder Pricing
+          </a>
+        </div>
       </div>
     </div>
   );
