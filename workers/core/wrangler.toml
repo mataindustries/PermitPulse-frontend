@@ -1,0 +1,20 @@
+name = "pp-core"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+
+[vars]
+# Allow *your frontend* origin; adjust if needed.
+ALLOWED_ORIGIN = "https://getpermitpulse.com"
+
+# Service bindings to the other workers:
+[[services]]
+binding = "LA"       # env.LA.fetch()
+service = "pp-la"
+
+[[services]]
+binding = "SD_SAC"   # env.SD_SAC.fetch()
+service = "pp-sd-sac"
+
+[[services]]
+binding = "WAIT"     # env.WAIT.fetch()
+service = "pp-waitlist"

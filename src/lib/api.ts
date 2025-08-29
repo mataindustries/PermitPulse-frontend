@@ -79,4 +79,17 @@ export async function subscribe(email: string, city?: string) {
     throw new Error(`Subscribe failed: ${r.status} ${r.statusText} ${txt}`);
   }
   return r.json();
+}export async function submitWaitlist(email: string, opts?: { city?: string }) {
+    const base = "https://pp-waitlist.matasergio741.workers.dev"; // your Worker URL
+      const res = await fetch(`${base}/subscribe`, {
+          method: "POST",
+              headers: { "content-type": "application/json" },
+                  body: JSON.stringify({
+                        email,
+                              city: opts?.city || null,
+                                  }),
+                                    });
+
+                                      return res.json(); // gives back { ok: true, status: "subscribed" | "exists" }
+                                      }
 }

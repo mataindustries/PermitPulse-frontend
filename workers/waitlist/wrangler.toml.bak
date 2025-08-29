@@ -1,0 +1,12 @@
+name = "pp-waitlist"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+
+[[kv_namespaces]]
+binding = "WL"             # env.WL
+id = ""                    # fill after 'wrangler kv:namespace create'
+preview_id = ""
+
+[[kv_namespaces]]
+binding = "WL"
+

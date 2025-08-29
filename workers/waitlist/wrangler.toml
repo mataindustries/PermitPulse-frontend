@@ -1,0 +1,10 @@
+name = "pp-waitlist"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+
+binding = "WL"
+
+
+[[kv_namespaces]]
+binding = "WL"
+id = "8c9560388d9a49cfb2d03648af3795f5"
