@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { subscribe } from "../lib/api";
-
+import { subscribeToWaitlist } from "../lib/api";
 export default function WaitlistModal({
   open,
   onClose,
