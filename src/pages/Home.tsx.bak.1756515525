@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
+import WaitlistModal from "../components/WaitlistModal";
 import ExpansionBar from "../components/ExpansionBar";
 import CityStats from "../components/CityStats";
 import PermitTrend from "../components/PermitTrend";
 import PermitTable from "../components/PermitTable";
 import CityButtons from "../components/CityButtons";
-import WaitlistModal from "../components/WaitlistModal";
 
 type Permit = {
   permit_number: string;
@@ -64,7 +64,7 @@ export default function Home() {
     return () => {
       stop = true;
     };
-  }, [city]);
+);
 
   const viewRows = useMemo(() => {
     let r = rows;
@@ -76,11 +76,6 @@ export default function Home() {
           x.address?.toLowerCase().includes(s) ||
           x.work_description?.toLowerCase().includes(s) ||
           x.status?.toLowerCase().includes(s),
-      <WaitlistModal
-        open={waitlistOpen}
-        onClose={() => setWaitlistOpen(false)}
-        defaultCity={waitlistDefaultCity ?? city}
-      />
       );
     }
     const demo = new URLSearchParams(location.search).get("demo") === "1";
@@ -109,7 +104,7 @@ export default function Home() {
     <div style={{ paddingBottom: 40 }}>
       <ExpansionBar
         onJoin={() => {
-          setWaitlistDefaultCity(undefined);
+);
           setWaitlistOpen(true);
         }}
       />
@@ -171,5 +166,10 @@ export default function Home() {
 
       </div>
     </div>
+      <WaitlistModal
+        open={waitlistOpen}
+        onClose={() => setWaitlistOpen(false)}
+        defaultCity={waitlistDefaultCity ?? city}
+      />
   );
 }
