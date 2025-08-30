@@ -36,6 +36,12 @@ export default function Home() {
   const [ts, setTs] = useState<string | null>(null);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [waitlistDefaultCity, setWaitlistDefaultCity] = useState<
+
+  function openWaitlist(c?: string) {
+    setWaitlistDefaultCity(c);
+    setWaitlistOpen(true);
+  }
+
     string | undefined
   >(undefined);
   const [q, setQ] = useState("");
