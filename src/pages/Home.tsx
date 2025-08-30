@@ -208,4 +208,8 @@ export default function Home() {
         </div>
     </div>
   );
-}
+}<WaitlistModal
+  open={waitlistOpen}
+    onClose={() => setWaitlistOpen(false)}
+      defaultCity={waitlistDefaultCity}
+      />
