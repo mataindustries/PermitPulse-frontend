@@ -1,10 +1,14 @@
 // src/lib/api.ts
+
+/**
+ * Subscribe an email (and optional city) to the waitlist.
+ * If VITE_WAITLIST_URL is set, POST to that Worker; otherwise POST to /subscribe
+ * and let Cloudflare Pages/_redirects forward it.
+ */
 export async function subscribeToWaitlist(
   email: string,
   city?: string
 ): Promise<{ ok: boolean; status?: "subscribed" | "exists" }> {
-  // If VITE_WAITLIST_URL is set, call the Worker directly.
-  // Otherwise hit the local /subscribe (Pages rewrite should forward it).
   const base = (import.meta as any)?.env?.VITE_WAITLIST_URL?.toString().trim();
   const url = base ? `${base.replace(/\/+$/,"")}/subscribe` : "/subscribe";
 
@@ -22,5 +26,4 @@ export async function subscribeToWaitlist(
   }
 }
 
-// keep a named export for consumers
 export { subscribeToWaitlist };

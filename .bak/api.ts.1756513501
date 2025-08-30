@@ -1,0 +1,25 @@
+// src/lib/api.ts
+
+// ---- existing imports and helpers above ----
+
+// ---- waitlist subscribe helper ----
+export async function subscribeToWaitlist(email: string, city?: string) {
+  const res = await fetch(
+    import.meta.env.VITE_WAITLIST_URL || "/api/subscribe",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, city }),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Failed to subscribe: ${res.status}`);
+  }
+
+  // returns { ok: true, status: "subscribed" | "exists" }
+  return res.json();
+}
+
+export { subscribeToWaitlist as subscribe };
+
