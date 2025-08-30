@@ -1,11 +1,10 @@
-import WaitlistModal from '../components/WaitlistModal';
 import React, { useState,  useEffect, useMemo, useState } from "react";
+import WaitlistModal from '../components/WaitlistModal';
 import ExpansionBar from "../components/ExpansionBar";
 import CityStats from "../components/CityStats";
 import PermitTrend from "../components/PermitTrend";
 import PermitTable from "../components/PermitTable";
 import CityButtons from "../components/CityButtons";
-import WaitlistModal from "../components/WaitlistModal";
 
 type Permit = {
   permit_number: string;
@@ -140,27 +139,7 @@ export default function Home() {
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Join Waitlist
           </button>
-  <div id="wl-fab" style={{position:"fixed", right:12, bottom:12, zIndex:50}}>
-    <button
-      id="test-waitlist-btn"
-      onClick={() => setWaitlistOpen(true)}
-      className="px-3 py-2 bg-blue-500 text-white rounded-md shadow"
-    >
-      Join Waitlist
-    </button>
-  </div>
-
         </div>
-  <div id="wl-fab" style={{position:"fixed", right:12, bottom:12, zIndex:50}}>
-    <button
-      id="test-waitlist-btn"
-      onClick={() => setWaitlistOpen(true)}
-      className="px-3 py-2 bg-blue-500 text-white rounded-md shadow"
-    >
-      Join Waitlist
-    </button>
-  </div>
-
         </div>
 
         <input
@@ -194,27 +173,7 @@ export default function Home() {
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Join Waitlist
           </button>
-  <div id="wl-fab" style={{position:"fixed", right:12, bottom:12, zIndex:50}}>
-    <button
-      id="test-waitlist-btn"
-      onClick={() => setWaitlistOpen(true)}
-      className="px-3 py-2 bg-blue-500 text-white rounded-md shadow"
-    >
-      Join Waitlist
-    </button>
-  </div>
-
         </div>
-  <div id="wl-fab" style={{position:"fixed", right:12, bottom:12, zIndex:50}}>
-    <button
-      id="test-waitlist-btn"
-      onClick={() => setWaitlistOpen(true)}
-      className="px-3 py-2 bg-blue-500 text-white rounded-md shadow"
-    >
-      Join Waitlist
-    </button>
-  </div>
-
         </div>
 
         <CityStats rows={viewRows} />
@@ -236,27 +195,7 @@ export default function Home() {
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Join Waitlist
           </button>
-  <div id="wl-fab" style={{position:"fixed", right:12, bottom:12, zIndex:50}}>
-    <button
-      id="test-waitlist-btn"
-      onClick={() => setWaitlistOpen(true)}
-      className="px-3 py-2 bg-blue-500 text-white rounded-md shadow"
-    >
-      Join Waitlist
-    </button>
-  </div>
-
         </div>
-  <div id="wl-fab" style={{position:"fixed", right:12, bottom:12, zIndex:50}}>
-    <button
-      id="test-waitlist-btn"
-      onClick={() => setWaitlistOpen(true)}
-      className="px-3 py-2 bg-blue-500 text-white rounded-md shadow"
-    >
-      Join Waitlist
-    </button>
-  </div>
-
       </div>
         <div className="mt-4 flex justify-center">
           <button 
@@ -264,27 +203,7 @@ export default function Home() {
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Join Waitlist
           </button>
-  <div id="wl-fab" style={{position:"fixed", right:12, bottom:12, zIndex:50}}>
-    <button
-      id="test-waitlist-btn"
-      onClick={() => setWaitlistOpen(true)}
-      className="px-3 py-2 bg-blue-500 text-white rounded-md shadow"
-    >
-      Join Waitlist
-    </button>
-  </div>
-
         </div>
-  <div id="wl-fab" style={{position:"fixed", right:12, bottom:12, zIndex:50}}>
-    <button
-      id="test-waitlist-btn"
-      onClick={() => setWaitlistOpen(true)}
-      className="px-3 py-2 bg-blue-500 text-white rounded-md shadow"
-    >
-      Join Waitlist
-    </button>
-  </div>
-
     </div>
   );
 }
