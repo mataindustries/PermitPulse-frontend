@@ -23,4 +23,3 @@ export async function subscribeToWaitlist(
 }
 
 // keep a named export for consumers
-export { subscribeToWaitlist };
